@@ -1,0 +1,561 @@
+%============================================================================%
+%  INFOGRAPHICS CV -- Claudio Chagas
+%  Based on Jan Kuster's Infographics CV template (MIT Licence)
+%  Self-contained: g/ helpers inlined, icons via fontawesome (no PNG files)
+%============================================================================%
+
+\documentclass[10pt]{article}
+
+%--- ENCODING ----------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+
+%--- LOGIC -------------------------------------------------------------------
+\usepackage{xifthen}
+\usepackage{calc}
+
+%--- FONT --------------------------------------------------------------------
+\usepackage[default]{raleway}
+\renewcommand*\familydefault{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage{moresize}
+
+%--- ICONS (fontawesome package -- no PNG files needed) ----------------------
+\usepackage{fontawesome5}
+\usepackage{textcomp}
+\renewcommand{\copyright}{\textcopyright}
+
+%--- PAGE LAYOUT -------------------------------------------------------------
+\usepackage{fancyhdr}
+\fancyhf{}
+\renewcommand{\headrule}{}
+\lfoot{\footnotesize Copyright \copyright\ Claudio Chagas, \today}
+
+\usepackage[a4paper]{geometry}
+\geometry{top=1cm, bottom=1cm, left=1cm, right=1cm}
+\pagestyle{fancy}
+\setlength{\headheight}{0.0pt}
+\lhead{}\rhead{}\chead{}
+\setlength{\parindent}{0mm}
+
+%--- TABLE -------------------------------------------------------------------
+\usepackage{array}
+\newcolumntype{x}[1]{>{\raggedleft\hspace{0pt}}p{#1}}
+
+%--- GRAPHICS ----------------------------------------------------------------
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{tikz}
+\usetikzlibrary{shapes, backgrounds}
+
+\newcommand{\vcenteredinclude}[1]{\begingroup
+\setbox0=\hbox{\includegraphics{#1}}%
+\parbox{\wd0}{\box0}\endgroup}
+
+\newcommand*{\vcenteredhbox}[1]{\begingroup
+\setbox0=\hbox{#1}\parbox{\wd0}{\box0}\endgroup}
+
+%--- ICON COMMANDS (fontawesome, replaces PNG system) ------------------------
+\newcommand{\icon}[2]{\colorbox{thirdcol}{\makebox(#2,#2){\textcolor{sectcol}{\csname fa#1\endcsname}}}}
+\newcommand{\icontext}[3]{%
+	\vcenteredhbox{\icon{#1}{#2}} \vcenteredhbox{\textcolor{textcol}{#3}}%
+}
+
+%--- COLOURS -----------------------------------------------------------------
+\usepackage{color}
+\definecolor{maincol}{RGB}{255,150,0}
+\definecolor{secondcol}{RGB}{0,178,255}
+\definecolor{thirdcol}{RGB}{0,80,130}
+\definecolor{fourthcol}{RGB}{0,100,160}
+\definecolor{fifthcol}{RGB}{0,120,200}
+\definecolor{sixthcol}{RGB}{0,80,130}
+\definecolor{bgcol}{RGB}{190,220,255}
+\definecolor{textcol}{RGB}{0,50,80}
+\definecolor{sectcol}{RGB}{255,255,255}
+\pagecolor{bgcol}
+
+%--- PAGE STYLE --------------------------------------------------------------
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\thepage}{}
+\renewcommand{\thesection}{}
+
+%--- TIKZ ARROWS -------------------------------------------------------------
+\newcommand{\tzlarrow}{(0,0) -- (0.2,0) -- (0.3,0.2) -- (0.2,0.4) -- (0,0.4) -- (0.1,0.2) -- cycle;}
+\newcommand{\tzrarrow}{(0,0.2) -- (0.1,0) -- (0.3,0) -- (0.2,0.2) -- (0.3,0.4) -- (0.1,0.4) -- cycle;}
+
+\newcommand{\larrow}[1]
+{\begin{tikzpicture}[scale=0.58]
+	\filldraw[fill=#1!100,draw=#1!100!black] \tzlarrow
+\end{tikzpicture}}
+
+\newcommand{\rarrow}[1]
+{\begin{tikzpicture}[scale=0.58]
+	\filldraw[fill=#1!100,draw=#1!100!black] \tzrarrow
+\end{tikzpicture}}
+
+%============================================================================%
+%  INLINED CHART HELPERS (from g/ directory -- Jan Kuster MIT)
+%============================================================================%
+
+%--- PIE CHART ---------------------------------------------------------------
+%counters for chart loop
+\newcounter{a}
+\newcounter{b}
+\newcounter{c}
+
+% draw a slice for a chart
+% param 1: Circle form - 90 = quarter, 180 = half, 360 = full
+% param 2: scale default=1 (scales only chart, not label text)
+% param 3: border color
+% param 4: label text color
+% param 5: label bg color
+% param 6:
+\newenvironment{piechart}[5] {
+
+	% draw a slice for a chart
+	% param 1: value x of 100
+	% param 2: label text
+	% param 3: fill color
+	% param 4:
+	% param 5:
+	% param 6:
+	\newcommand{\slice}[3] {
+
+		\setcounter{a}{\value{b}}
+		\addtocounter{b}{##1}
+
+		%set from angle point
+		\pgfmathparse{\thea/100*#1}
+	  	\let\pointa\pgfmathresult
+
+		%set toanglepoint
+		\pgfmathparse{\theb/100*#1}
+	  	\let\pointb\pgfmathresult
+
+		%set midangle
+	 	\pgfmathparse{0.5*\pointa+0.5*\pointb}
+	  	\let\midangle\pgfmathresult
+		
+		% draw the slice
+	  	\filldraw[fill=##3!100,draw=#3!100, line width=2pt ] (0,0) -- (\pointa:#2) arc (\pointa:\pointb:#2) -- cycle;
+
+	  	% draw label
+	  	\node[label=\midangle:\colorbox{#5}{\textcolor{#4}{##2}}] at (\midangle:#2) {};
+
+		\filldraw[fill=#3,draw=none] (0,0) circle (#2/2);
+	}
+
+	% execute commands
+	\setcounter{a}{0}
+	\setcounter{b}{0}
+	\begin{tikzpicture}
+}
+{\end{tikzpicture}}
+
+%--- BAR CHART ---------------------------------------------------------------
+\newcounter{barcount}
+
+
+% draw a bar chart
+% param 1: width
+% param 2: height
+% param 3: border color
+% param 4: label text color
+% param 5: label bg color
+% param 6: cat 1 color
+\newenvironment{barchart}[8]{
+
+	\newcommand{\barwidth}{0.35}
+	\newcommand{\barsep}{0.2}
+
+	% param 1: overall percent
+	% param 2: label
+	% param 3: cat 1 percent
+	% param 4: cat 2 percent
+	% param 5: cat 3 percent
+	\newcommand{\baritem}[5]{
+
+		\pgfmathparse{##3+##4+##5}
+		 \let\perc\pgfmathresult
+
+		\pgfmathparse{#2}
+		 \let\barsize\pgfmathresult
+	
+		\pgfmathparse{\barsize*##3/100}
+		 \let\barone\pgfmathresult
+	
+		\pgfmathparse{\barsize*##4/100}
+		 \let\bartwo\pgfmathresult
+	
+		\pgfmathparse{\barsize*##5/100}
+		 \let\barthree\pgfmathresult
+
+		\pgfmathparse{(\barwidth*\thebarcount)+(\barsep*\thebarcount)}
+		 \let\barx\pgfmathresult
+
+		\filldraw[fill=#6, draw=none] (0,-\barx) rectangle (\barone,-\barx-\barwidth);
+		\filldraw[fill=#7, draw=none] (\barone, -\barx) rectangle (\barone+\bartwo,-\barx-\barwidth);
+		\filldraw[fill=#8, draw=none] (\barone+\bartwo,-\barx ) rectangle (\barone+\bartwo+\barthree,-\barx-\barwidth);
+
+		\node [label=180:\colorbox{#5}{\textcolor{#4}{##2}}] at (0,-\barx-0.175) {};
+		\addtocounter{barcount}{1}
+	}
+	\begin{tikzpicture}
+	\setcounter{barcount}{0}
+	
+}
+{\end{tikzpicture}}
+
+%--- BUBBLE CHART ------------------------------------------------------------
+\newcommand{\bubble}[5]{
+	\definecolor{tmpcol}{RGB}{50,50,#5}
+	% slice
+  	\filldraw[fill=thirdcol,draw=none] (#1,0.5) circle (#3);
+
+  	% outer label
+  	\node[label=\textcolor{textcol}{#4}] at (#1,0.7) {};
+}
+
+\newcommand{\bubbles}[2]{
+	%reset counters
+	\setcounter{a}{0}
+	\setcounter{c}{150}
+	\begin{tikzpicture}[scale=3]
+	\foreach \p/\t in {#1} {
+	    	\addtocounter{a}{1}
+	    	\bubble{\thea/2}{\theb}{\p/25}{\t}{1\p0}
+	}
+	\end{tikzpicture}
+}
+
+%--- SQUARE CHART ------------------------------------------------------------
+\newcommand{\squares}[2]{
+	%reset counters
+	\setcounter{a}{0}
+	\setcounter{b}{0}
+	\setcounter{c}{50}
+	\begin{tikzpicture}[scale=3]
+	\foreach \p/\t in {#1} {
+		\setcounter{a}{\value{b}}
+	    	\addtocounter{b}{\p}
+	    	\square{\thea/100*#2}{\theb/100*#2}{\p\%}{\t}{thirdcol}
+	}
+	\end{tikzpicture}
+}
+
+\newcommand{\square}[5] {
+ 	\pgfmathparse{#1+0.5*(#2-#1)}
+  	\let\midangle\pgfmathresult
+
+	\draw[draw=sectcol] (0.4, \midangle) -- (0.6,\midangle);
+	% slice
+  	\filldraw[fill=#5!100,draw=bgcol!100, line width=3pt] (0,#1) -- (0.5,#1) -- (0.5,#2) -- (0,#2) -- cycle;
+  	% outer label
+  	\node[label=360:\colorbox{sectcol}{\textcolor{textcol}{#4}}] at (0.55,\midangle) {};
+}
+
+%--- TIMELINE ----------------------------------------------------------------
+% define global counters
+\newcounter{yearcount}
+
+
+\newcounter{leftcount}
+
+% env cvtimeline
+%
+% creates a vertical cv timeline
+%
+% param 1: start year
+% param 2: end year
+% param 3: overall width
+%param 4: overall height
+\newenvironment{cvtimeline}[4]{
+	
+	\newcommand{\cvcategory}[2]{
+		\node[label=\mbox{\colorbox{##1}{\strut\hspace{2pt}}\colorbox{white}{\textcolor{textcol}{##2}}}] at (0,-5) {}; %start year
+	}
+
+	\newcommand{\bxwidth}{4.5}
+	\newcommand{\bxheight}{2}
+
+
+	% creates a stretched box as cv entry headline followed by two paragraphs about 
+	% the work you did
+	% param 1:	event start month/year
+	% param 2:	event end month/year
+	% param 3:  event name
+	% param 4:	institution (where did you work / study)
+	% param 5:	what was your position
+	% param 6:	color
+	% param 7: level (position, use minus for left placement)
+	\newcommand{\cvevent}[7] {
+		
+		\foreach \monthf/\yearf in {##1} {
+			\foreach \montht/\yeart in {##2} {
+
+				\pgfmathparse{#3/\fullrange*((\yearf-#1)+(\monthf/12))}
+  				\let\startexp\pgfmathresult
+				\pgfmathparse{#3/\fullrange*((\yeart-#1)+(\montht/12))}
+  				\let\endexp\pgfmathresult
+				\pgfmathparse{1/(\endexp-\startexp+1)}
+  				\let\lenexp\pgfmathresult
+				\pgfmathparse{0.5*\endexp+0.5*\startexp}
+  				\let\midexp\pgfmathresult
+
+				%\filldraw[fill=##6,draw=none, opacity=0.9] (-0.15-##7,\startexp) rectangle (-0.15-##7-0.5,\endexp);
+				\draw[draw=##6, line width=1.5pt] (0, \startexp) -- (1,\startexp);
+
+				\node[label={[label distance=0]0:\colorbox{##6}{\strut}\colorbox{white}{\textcolor{gray}{##1}\hspace{3pt}\textcolor{textcol}{##3}}}] at (0.5, \startexp) {};
+			}
+			\addtocounter{leftcount}{1}
+		}
+	}
+
+	%--------------------------------------------------------------------------------------
+	%	BEGIN
+	%--------------------------------------------------------------------------------------
+
+	\begin{tikzpicture}
+
+	\setcounter{leftcount}{1}
+
+	%calc fullrange= number of years
+ 	\pgfmathparse{(#2-#1)}
+  	\let\fullrange\pgfmathresult
+	\draw[draw=textcol,line width=4pt] (0,0) -- (0,#3) ;	%the timeline
+
+	%for each year put a horizontal line in place
+	\setcounter{yearcount}{1}
+	\whiledo{\value{yearcount} < \fullrange}{
+		\draw[fill=white,draw=textcol, line width=2pt]  (0,#3/\fullrange*\value{yearcount}) circle (0.1);
+		\stepcounter{yearcount}
+	}
+
+	%start year
+	\filldraw[fill=white!100,draw=textcol,line width=3pt] (0,-0.5) circle (0.5);
+	\node[label=\textcolor{textcol}{\textbf{\small#1}}] at (0,-0.85) {}; 
+
+	%end year
+	\filldraw[fill=white!100,draw=textcol,line width=5pt] (0,#3+0.75) circle (0.75);
+	\node[label=\textcolor{textcol}{\textbf{\large#2}}] at (0,#3+0.42) {}; 
+
+
+	
+}%end begin part of newenv
+{\end{tikzpicture}}
+
+%--- FACT BUBBLE -------------------------------------------------------------
+% draw a circle with facts
+% param 1: fact text
+% param 2: scale default=1 (scales only chart, not label text)
+% param 3: big border color
+% param 4: second border color
+% param 5: label bg color
+\newcommand{\factbubble}[5]{
+	\begin{tikzpicture}
+	\pgfmathparse{#2*2}
+	\let\pbxwidth\pgfmathresult
+		\filldraw[fill=#3,draw=none] (0,0) circle (#2 * 1.5);
+		\filldraw[fill=#5,draw=#4, line width=3.5pt] (0,0) circle (#2 * 1.2);
+		\node at (0,0) {
+			\parbox{\pbxwidth cm}{
+				\begin{center}	
+					#1
+				\end{center}
+			}
+		};
+	\end{tikzpicture}
+}
+
+
+%============================================================================%
+%  CUSTOM SECTION COMMANDS
+%============================================================================%
+
+\newcommand{\cvsection}[2]{%
+	\textcolor{sectcol}{\uppercase{\textbf{#1}}}%
+}
+
+\newcommand{\cvsect}[4]{%
+	\textcolor{#3}{\hrule}%
+	\colorbox{#3}{{\cvsection{#1}{#4}}}%
+}
+
+\newcommand{\metasection}[2]{%
+	\begin{tabular*}{1\textwidth}{ l l }
+		#1&#2\\[12pt]
+	\end{tabular*}%
+}
+
+\newcommand{\cveventmeta}[2]{%
+	\mbox{\mystrut \hspace{87pt}\textit{#1}}\\
+	#2%
+}
+
+\newcommand{\mystrut}{\rule[-.3\baselineskip]{0pt}{\baselineskip}}
+\newcommand{\legend}[3]{\parbox{#2}{\textcolor{#3}{\rule{#2}{4pt}}\\#1}}
+\newcommand{\lorem}{Lorem ipsum dolor sit amet.}
+
+%============================================================================%
+%  DOCUMENT
+%============================================================================%
+\begin{document}
+
+\pagestyle{fancy}
+
+%--- TITLE HEADLINE ----------------------------------------------------------
+\mystrut
+\vspace{-12pt}
+
+\begin{tabular*}{1\textwidth}{c c c}
+	\parbox[c]{0.4\linewidth}{
+		\colorbox{thirdcol}{\huge{}{\textcolor{white}{\textbf{\uppercase{Claudio Chagas}}} }}\\
+		\Large{\textcolor{thirdcol}{\textsc{Senior Localization Specialist | EN$\rightarrow$PT-BR}}}\\
+	}&
+	\parbox{0.25\textwidth}{
+	\icontext{MapMarker}{10pt}{Rio de Janeiro, Brazil}\\
+	\icontext{Mobile}{10pt}{+55 21 999 5602 54}\\
+	\icontext{Envelope}{10pt}{aviatorone@gmail.com}\\
+	}&
+	\parbox{0.3\textwidth}{
+	\icontext{MousePointer}{10pt}{www.logostranslate.wordpress.com}\\
+	\icontext{Github}{10pt}{github.com/claudchagas}\\
+	\icontext{Linkedin}{10pt}{linkedin.com/in/claudiochagas}\\
+	}
+\end{tabular*}
+
+\small
+\vspace{16pt}
+
+\begin{minipage}{0.59\textwidth}
+
+%--- FACTS -------------------------------------------------------------------
+	\mbox{
+		\parbox[c][3cm][c]{0.29\textwidth}{
+		\textcolor{textcol}{My journey in translation began with volunteering for global non-profits, grounded in a Bachelor's degree in Publishing from Oxford. I now serve enterprise clients including OpenAI, Mailchimp, Keeper Security, Lucid Software, SAP, and Equinix through Smartling and Mojito.}
+		}
+		\hspace{10pt}
+		\parbox[c][3cm][c]{0.32\textwidth}{
+			\begin{center}
+			\factbubble{\huge{\textcolor{sectcol}{\textbf{B.A.}}}\\\small{\textcolor{sectcol}{\textbf{Publishing}}}}{1}{maincol}{sectcol}{thirdcol}\\
+			\textcolor{textcol}{latest degree from}\\
+			\textcolor{textcol}{\textbf{Oxford Brookes University}}
+			\end{center}
+		}
+		\hspace{10pt}
+		\parbox[c][3cm][c]{0.29\textwidth}{
+		\textcolor{textcol}{I specialise in technical UI localisation, AI platform content, SaaS documentation, and marketing transcreation for global technology enterprises targeting Brazilian audiences.}
+		}
+	}
+	\vspace{34pt}
+
+%--- SKILLS AND TECHNOLOGIES -------------------------------------------------
+	\cvsect{Skills and Technologies}{0.49}{thirdcol}{textcol}\\[4pt]
+	\mbox{
+		\parbox[b][150pt][c]{0.35\textwidth}{
+			\textcolor{textcol}{I combine deep linguistic expertise with proprietary workflow infrastructure, including Python tooling for glossary automation and Mojito skill files for enterprise accounts.}\\
+
+			\cvsect{Languages}{0.49}{thirdcol}{textcol}\\[4pt]
+			\icontext{Language}{14pt}{\colorbox{maincol}{Portuguese (native)}}\\
+			\icontext{Language}{14pt}{\colorbox{maincol}{English (C2)}}\\
+		}
+
+		\begin{piechart}{360}{2}{bgcol}{textcol}{sectcol}
+			\slice{16}{Copyediting}{thirdcol}
+			\slice{6}{Subtitling}{fourthcol}
+			\slice{10}{Personal Admin}{fifthcol}
+			\slice{16}{Proofreading}{secondcol}
+			\slice{54}{Translation}{maincol}
+		\end{piechart}\\
+	}
+	\begin{center}
+	\begin{tikzpicture}
+		\draw[draw=sectcol,dashed, opacity=0.5] (4,0) -- (-4,0);
+	\end{tikzpicture}
+	\end{center}
+
+	\mbox{\hspace{-14pt}
+		\begin{barchart}{10}{5.5}{sectcol}{textcol}{sectcol}{maincol}{secondcol}{thirdcol}
+			\baritem{90}{Smartling / Mojito}{100}{0}{0}
+			\baritem{80}{SDL Trados Studio}{0}{0}{70}
+			\baritem{75}{Python / GitHub}{0}{65}{0}
+			\baritem{65}{Google Suite}{0}{0}{60}
+			\baritem{60}{LaTeX}{0}{0}{50}
+		\end{barchart}
+		\hspace{10pt}
+		\parbox[b][100pt][c]{0.3\textwidth}{\textcolor{textcol}{I work across Smartling and Mojito for enterprise clients including OpenAI, Keeper Security, Lucid Software, and SAP, delivering UI strings, technical documentation, and marketing content.}}
+	}
+	\begin{center}
+	\begin{tikzpicture}
+		\draw[draw=sectcol,dashed, opacity=0.5] (4,0) -- (-4,0);
+	\end{tikzpicture}
+	\end{center}
+	\begin{center}
+	\mbox{
+		\parbox[b][2cm][c]{3cm}{
+			\textcolor{textcol}{I work with a specialised toolset built around enterprise localisation platforms and custom automation.}
+		}\hspace{12pt}
+		\bubbles{6/Smartling, 5/Mojito, 4/Trados, 4/Python, 3/LaTeX}{\cvsection{Technologies}}
+	}
+	\end{center}
+
+%--- ACTIVITIES --------------------------------------------------------------
+	\cvsect{Activities}{0.49}{thirdcol}{textcol}\\[20pt]
+	\mbox{
+		\parbox[b][3cm][c]{3cm}{
+			\factbubble{\HUGE{\textcolor{sectcol}{\textbf{15+}}}\\\large{\textcolor{sectcol}{\textbf{years}}}}{0.85}{maincol}{sectcol}{thirdcol}\\
+			\textcolor{textcol}{of experience in the}\\
+			\textcolor{textcol}{\textbf{\mbox{Translation Industry}}}
+		}
+
+		\parbox[b][3cm][c]{4cm}{
+			\textcolor{textcol}{I enjoy cycling to help maintain a healthy work-life balance and escape the city's hustle and bustle.}
+		}
+
+		\squares{20/Meditation,40/Biking,10/News,20/Music}{1}
+	}
+\end{minipage}
+\begin{minipage}{0.05\textwidth}
+	\begin{center}
+		\begin{tikzpicture}
+			\draw[draw=sectcol,dashed, opacity=0.5] (0,-12) -- (0,12);
+		\end{tikzpicture}
+	\end{center}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+
+%--- EXPERIENCE AND EDUCATION ------------------------------------------------
+\cvsect{Experience and Education}{0.4}{thirdcol}{textcol}\\[16pt]
+
+\hspace{60pt}\mbox{\legend{Experience}{1.8cm}{maincol} \legend{Events}{1.1cm}{secondcol} \legend{Education}{1.5cm}{thirdcol}}
+\vspace{-40pt}
+\begin{center}
+
+\begin{cvtimeline}{2000}{2026}{21}{\linewidth}
+\cvevent{8/2000}{7/2003}{Bachelor Studies, UK}{Oxford Brookes}{Master Thesis: Why Mass-Market Paperback Publishing is Still to Catch on in Brazil}{thirdcol}{0}
+\cvevent{1/2001}{12/2002}{Translator/Copy-editor}{Viva Network}{Worked on the Portuguese edition of a facilitator's handbook and four other language versions of a children worker's pack}{maincol}{1}
+\cvevent{6/2001}{7/2001}{Student Placement}{Oxford Brookes}{Worked as the administrator of the British Book Design and Production Awards \& BPIF for two consecutive years, in 2001 and 2002}{maincol}{1}
+\cvevent{6/2002}{7/2002}{Student Placement}{Oxford Brookes}{Worked as the administrator of the British Book Design and Production Awards \& BPIF for two consecutive years, in 2001 and 2002}{maincol}{1}
+\cvevent{3/2003}{3/2003}{The London Book Fair}{LBF}{The London Book Fair is the global marketplace for rights negotiation and the sale and distribution of content across print, audio, TV, film and digital channels}{secondcol}{0}
+\cvevent{10/2003}{10/2003}{Ashmolean Museum Oxford}{University of Oxford}{Worked as Part-time Sales and Display Assistant at the Ashmolean Museum Oxford book and gift shop}{maincol}{1}
+\cvevent{6/2004}{6/2004}{Rio Moto-GP 2004}{University of Oxford}{PA to the National Press Officer}{secondcol}{0}
+\cvevent{4/2005}{5/2005}{Lexus Brochures Translation}{Just Customer Communication}{Proofreading and editing translated copy and managing electronic copy-editing}{maincol}{1}
+\cvevent{9/2007}{11/2008}{Real Estate News Translation}{Dream Homes World Wide}{Work for an international real estate developer providing English translations from Portuguese and Spanish documents}{maincol}{1}
+\cvevent{8/2008}{9/2008}{User Interface Translation}{G.host Inc.}{Translation of the G.ho.st Virtual Computer user interface strings (Client Module -- 14,500+ words) into Brazilian Portuguese}{maincol}{1}
+\cvevent{10/2009}{10/2009}{Blog Articles Translation}{Sivers.org}{Translation of blog articles into Brazilian Portuguese for Derek Sivers, founder of CD Baby}{maincol}{1}
+\cvevent{3/2010}{3/2010}{Business Article Translation}{London Business School}{Translation of an article from the Brazilian business magazine Epoca into English, on the legacy of Jorge Paulo Lemann, the founder of Bank Garantia}{maincol}{1}
+\cvevent{7/2010}{9/2010}{Admin Interface Translation}{SafeKidZone}{String translation for backend database of SafeKidZone and SafeTREC website}{maincol}{1}
+\cvevent{3/2011}{4/2011}{Project Research Assistant}{University of Bremen}{Conduct Internet-based research on the presence of automakers on the social media landscape in Brazil, and translate relevant content into English}{maincol}{1}
+\cvevent{9/2011}{9/2011}{Website Translation}{Fortune3, Inc.}{Translate 700 strings (approx. 5000 words) of an ecommerce website into Portuguese}{maincol}{1}
+\cvevent{1/2009}{12/2012}{Communications Assistant}{Alpha International}{Assist the Relationship Manager and other managers of the national and international teams on a range of projects, from Jan 2009 to Dec 2012}{maincol}{1}
+\cvevent{11/2012}{11/2012}{Alpha Conference Aparecida}{Alpha International}{Help set up the venue, providing an essential service for the conference and seminar sessions}{secondcol}{0}
+\cvevent{7/2013}{7/2013}{World Youth Day 2013}{Alpha International}{Help find local suppliers, providing essential services for the event}{secondcol}{0}
+\cvevent{1/2014}{1/2014}{Executive Assistant}{Heathfield}{Assist the Director with a range of roles to support business operations}{maincol}{1}
+\cvevent{8/2016}{8/2016}{Rio 2016 Summer Olympics}{Organising Committee for the Rio 2016}{Help run the Venue Media Centre, providing an essential service and helping the press}{secondcol}{0}
+\cvevent{6/2017}{10/2017}{Subtitles Translation}{ZOO Digital Group plc}{Provide subtitle translation services for films or any other localization-related tasks}{maincol}{1}
+\cvevent{5/2019}{6/2024}{Senior Translator \& Localization Specialist}{Smartling / Mojito}{Delivering EN$\rightarrow$PT-BR localisation for enterprise clients including OpenAI, Mailchimp, Keeper Security, Lucid Software, SAP, and Equinix --- spanning AI platform UI, SaaS documentation, and marketing content}{maincol}{1}
+\end{cvtimeline}
+\end{center}
+\end{minipage}
+
+\end{document}
