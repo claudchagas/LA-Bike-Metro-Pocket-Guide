@@ -1,561 +1,872 @@
-%============================================================================%
-%  INFOGRAPHICS CV -- Claudio Chagas
-%  Based on Jan Kuster's Infographics CV template (MIT Licence)
-%  Self-contained: g/ helpers inlined, icons via fontawesome (no PNG files)
-%============================================================================%
+% LA Bike & Metro Travel Guide - LaTeX Version
+% Compile with pdflatex
 
-\documentclass[10pt]{article}
+\documentclass[10pt,letterpaper]{article}
 
-%--- ENCODING ----------------------------------------------------------------
+% Packages
+\usepackage[letterpaper, margin=0.5in]{geometry}
 \usepackage[utf8]{inputenc}
-
-%--- LOGIC -------------------------------------------------------------------
-\usepackage{xifthen}
-\usepackage{calc}
-
-%--- FONT --------------------------------------------------------------------
-\usepackage[default]{raleway}
-\renewcommand*\familydefault{\sfdefault}
-\usepackage[T1]{fontenc}
-\usepackage{moresize}
-
-%--- ICONS (fontawesome package -- no PNG files needed) ----------------------
-\usepackage{fontawesome5}
-\usepackage{textcomp}
-\renewcommand{\copyright}{\textcopyright}
-
-%--- PAGE LAYOUT -------------------------------------------------------------
-\usepackage{fancyhdr}
-\fancyhf{}
-\renewcommand{\headrule}{}
-\lfoot{\footnotesize Copyright \copyright\ Claudio Chagas, \today}
-
-\usepackage[a4paper]{geometry}
-\geometry{top=1cm, bottom=1cm, left=1cm, right=1cm}
-\pagestyle{fancy}
-\setlength{\headheight}{0.0pt}
-\lhead{}\rhead{}\chead{}
-\setlength{\parindent}{0mm}
-
-%--- TABLE -------------------------------------------------------------------
-\usepackage{array}
-\newcolumntype{x}[1]{>{\raggedleft\hspace{0pt}}p{#1}}
-
-%--- GRAPHICS ----------------------------------------------------------------
 \usepackage{graphicx}
-\usepackage{wrapfig}
-\usepackage{tikz}
-\usetikzlibrary{shapes, backgrounds}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fontawesome5}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{fancyhdr}
 
-\newcommand{\vcenteredinclude}[1]{\begingroup
-\setbox0=\hbox{\includegraphics{#1}}%
-\parbox{\wd0}{\box0}\endgroup}
+% Define colors
+\definecolor{primary}{RGB}{25,118,210}
+\definecolor{secondary}{RGB}{79,195,247}
+\definecolor{accent}{RGB}{41,182,246}
+\definecolor{warning}{RGB}{255,152,0}
+\definecolor{success}{RGB}{76,175,80}
+\definecolor{danger}{RGB}{244,67,54}
 
-\newcommand*{\vcenteredhbox}[1]{\begingroup
-\setbox0=\hbox{#1}\parbox{\wd0}{\box0}\endgroup}
-
-%--- ICON COMMANDS (fontawesome, replaces PNG system) ------------------------
-\newcommand{\icon}[2]{\colorbox{thirdcol}{\makebox(#2,#2){\textcolor{sectcol}{\csname fa#1\endcsname}}}}
-\newcommand{\icontext}[3]{%
-	\vcenteredhbox{\icon{#1}{#2}} \vcenteredhbox{\textcolor{textcol}{#3}}%
+% Configure hyperlinks
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    urlcolor=primary,
+    pdftitle={LA Bike \& Metro Travel Guide},
+    pdfauthor={Travel Guide}
 }
 
-%--- COLOURS -----------------------------------------------------------------
-\usepackage{color}
-\definecolor{maincol}{RGB}{255,150,0}
-\definecolor{secondcol}{RGB}{0,178,255}
-\definecolor{thirdcol}{RGB}{0,80,130}
-\definecolor{fourthcol}{RGB}{0,100,160}
-\definecolor{fifthcol}{RGB}{0,120,200}
-\definecolor{sixthcol}{RGB}{0,80,130}
-\definecolor{bgcol}{RGB}{190,220,255}
-\definecolor{textcol}{RGB}{0,50,80}
-\definecolor{sectcol}{RGB}{255,255,255}
-\pagecolor{bgcol}
+% Custom section formatting
+\titleformat{\section}
+  {\Large\bfseries\color{primary}}
+  {}
+  {0pt}
+  {}
+  [\titlerule]
 
-%--- PAGE STYLE --------------------------------------------------------------
-\renewcommand{\headrulewidth}{0pt}
-\renewcommand{\footrulewidth}{0pt}
-\renewcommand{\thepage}{}
-\renewcommand{\thesection}{}
+\titleformat{\subsection}
+  {\large\bfseries\color{primary}}
+  {}
+  {0pt}
+  {}
 
-%--- TIKZ ARROWS -------------------------------------------------------------
-\newcommand{\tzlarrow}{(0,0) -- (0.2,0) -- (0.3,0.2) -- (0.2,0.4) -- (0,0.4) -- (0.1,0.2) -- cycle;}
-\newcommand{\tzrarrow}{(0,0.2) -- (0.1,0) -- (0.3,0) -- (0.2,0.2) -- (0.3,0.4) -- (0.1,0.4) -- cycle;}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{accent}}
+  {}
+  {0pt}
+  {}
 
-\newcommand{\larrow}[1]
-{\begin{tikzpicture}[scale=0.58]
-	\filldraw[fill=#1!100,draw=#1!100!black] \tzlarrow
-\end{tikzpicture}}
+% Reduce spacing
+\titlespacing*{\section}{0pt}{12pt}{8pt}
+\titlespacing*{\subsection}{0pt}{10pt}{6pt}
+\titlespacing*{\subsubsection}{0pt}{8pt}{4pt}
 
-\newcommand{\rarrow}[1]
-{\begin{tikzpicture}[scale=0.58]
-	\filldraw[fill=#1!100,draw=#1!100!black] \tzrarrow
-\end{tikzpicture}}
-
-%============================================================================%
-%  INLINED CHART HELPERS (from g/ directory -- Jan Kuster MIT)
-%============================================================================%
-
-%--- PIE CHART ---------------------------------------------------------------
-%counters for chart loop
-\newcounter{a}
-\newcounter{b}
-\newcounter{c}
-
-% draw a slice for a chart
-% param 1: Circle form - 90 = quarter, 180 = half, 360 = full
-% param 2: scale default=1 (scales only chart, not label text)
-% param 3: border color
-% param 4: label text color
-% param 5: label bg color
-% param 6:
-\newenvironment{piechart}[5] {
-
-	% draw a slice for a chart
-	% param 1: value x of 100
-	% param 2: label text
-	% param 3: fill color
-	% param 4:
-	% param 5:
-	% param 6:
-	\newcommand{\slice}[3] {
-
-		\setcounter{a}{\value{b}}
-		\addtocounter{b}{##1}
-
-		%set from angle point
-		\pgfmathparse{\thea/100*#1}
-	  	\let\pointa\pgfmathresult
-
-		%set toanglepoint
-		\pgfmathparse{\theb/100*#1}
-	  	\let\pointb\pgfmathresult
-
-		%set midangle
-	 	\pgfmathparse{0.5*\pointa+0.5*\pointb}
-	  	\let\midangle\pgfmathresult
-		
-		% draw the slice
-	  	\filldraw[fill=##3!100,draw=#3!100, line width=2pt ] (0,0) -- (\pointa:#2) arc (\pointa:\pointb:#2) -- cycle;
-
-	  	% draw label
-	  	\node[label=\midangle:\colorbox{#5}{\textcolor{#4}{##2}}] at (\midangle:#2) {};
-
-		\filldraw[fill=#3,draw=none] (0,0) circle (#2/2);
-	}
-
-	% execute commands
-	\setcounter{a}{0}
-	\setcounter{b}{0}
-	\begin{tikzpicture}
-}
-{\end{tikzpicture}}
-
-%--- BAR CHART ---------------------------------------------------------------
-\newcounter{barcount}
-
-
-% draw a bar chart
-% param 1: width
-% param 2: height
-% param 3: border color
-% param 4: label text color
-% param 5: label bg color
-% param 6: cat 1 color
-\newenvironment{barchart}[8]{
-
-	\newcommand{\barwidth}{0.35}
-	\newcommand{\barsep}{0.2}
-
-	% param 1: overall percent
-	% param 2: label
-	% param 3: cat 1 percent
-	% param 4: cat 2 percent
-	% param 5: cat 3 percent
-	\newcommand{\baritem}[5]{
-
-		\pgfmathparse{##3+##4+##5}
-		 \let\perc\pgfmathresult
-
-		\pgfmathparse{#2}
-		 \let\barsize\pgfmathresult
-	
-		\pgfmathparse{\barsize*##3/100}
-		 \let\barone\pgfmathresult
-	
-		\pgfmathparse{\barsize*##4/100}
-		 \let\bartwo\pgfmathresult
-	
-		\pgfmathparse{\barsize*##5/100}
-		 \let\barthree\pgfmathresult
-
-		\pgfmathparse{(\barwidth*\thebarcount)+(\barsep*\thebarcount)}
-		 \let\barx\pgfmathresult
-
-		\filldraw[fill=#6, draw=none] (0,-\barx) rectangle (\barone,-\barx-\barwidth);
-		\filldraw[fill=#7, draw=none] (\barone, -\barx) rectangle (\barone+\bartwo,-\barx-\barwidth);
-		\filldraw[fill=#8, draw=none] (\barone+\bartwo,-\barx ) rectangle (\barone+\bartwo+\barthree,-\barx-\barwidth);
-
-		\node [label=180:\colorbox{#5}{\textcolor{#4}{##2}}] at (0,-\barx-0.175) {};
-		\addtocounter{barcount}{1}
-	}
-	\begin{tikzpicture}
-	\setcounter{barcount}{0}
-	
-}
-{\end{tikzpicture}}
-
-%--- BUBBLE CHART ------------------------------------------------------------
-\newcommand{\bubble}[5]{
-	\definecolor{tmpcol}{RGB}{50,50,#5}
-	% slice
-  	\filldraw[fill=thirdcol,draw=none] (#1,0.5) circle (#3);
-
-  	% outer label
-  	\node[label=\textcolor{textcol}{#4}] at (#1,0.7) {};
+% Custom boxes
+\newtcolorbox{infobox}[1][]{
+  colback=secondary!10,
+  colframe=primary,
+  fonttitle=\bfseries,
+  left=3mm,
+  right=3mm,
+  top=2mm,
+  bottom=2mm,
+  #1
 }
 
-\newcommand{\bubbles}[2]{
-	%reset counters
-	\setcounter{a}{0}
-	\setcounter{c}{150}
-	\begin{tikzpicture}[scale=3]
-	\foreach \p/\t in {#1} {
-	    	\addtocounter{a}{1}
-	    	\bubble{\thea/2}{\theb}{\p/25}{\t}{1\p0}
-	}
-	\end{tikzpicture}
+\newtcolorbox{warningbox}[1][]{
+  colback=warning!10,
+  colframe=warning,
+  fonttitle=\bfseries,
+  left=3mm,
+  right=3mm,
+  top=2mm,
+  bottom=2mm,
+  #1
 }
 
-%--- SQUARE CHART ------------------------------------------------------------
-\newcommand{\squares}[2]{
-	%reset counters
-	\setcounter{a}{0}
-	\setcounter{b}{0}
-	\setcounter{c}{50}
-	\begin{tikzpicture}[scale=3]
-	\foreach \p/\t in {#1} {
-		\setcounter{a}{\value{b}}
-	    	\addtocounter{b}{\p}
-	    	\square{\thea/100*#2}{\theb/100*#2}{\p\%}{\t}{thirdcol}
-	}
-	\end{tikzpicture}
+\newtcolorbox{tipbox}[1][]{
+  colback=success!10,
+  colframe=success,
+  fonttitle=\bfseries,
+  left=3mm,
+  right=3mm,
+  top=2mm,
+  bottom=2mm,
+  #1
 }
 
-\newcommand{\square}[5] {
- 	\pgfmathparse{#1+0.5*(#2-#1)}
-  	\let\midangle\pgfmathresult
-
-	\draw[draw=sectcol] (0.4, \midangle) -- (0.6,\midangle);
-	% slice
-  	\filldraw[fill=#5!100,draw=bgcol!100, line width=3pt] (0,#1) -- (0.5,#1) -- (0.5,#2) -- (0,#2) -- cycle;
-  	% outer label
-  	\node[label=360:\colorbox{sectcol}{\textcolor{textcol}{#4}}] at (0.55,\midangle) {};
+\newtcolorbox{routebox}[1][]{
+  colback=success!5,
+  colframe=success!80,
+  left=3mm,
+  right=3mm,
+  top=2mm,
+  bottom=2mm,
+  #1
 }
 
-%--- TIMELINE ----------------------------------------------------------------
-% define global counters
-\newcounter{yearcount}
-
-
-\newcounter{leftcount}
-
-% env cvtimeline
-%
-% creates a vertical cv timeline
-%
-% param 1: start year
-% param 2: end year
-% param 3: overall width
-%param 4: overall height
-\newenvironment{cvtimeline}[4]{
-	
-	\newcommand{\cvcategory}[2]{
-		\node[label=\mbox{\colorbox{##1}{\strut\hspace{2pt}}\colorbox{white}{\textcolor{textcol}{##2}}}] at (0,-5) {}; %start year
-	}
-
-	\newcommand{\bxwidth}{4.5}
-	\newcommand{\bxheight}{2}
-
-
-	% creates a stretched box as cv entry headline followed by two paragraphs about 
-	% the work you did
-	% param 1:	event start month/year
-	% param 2:	event end month/year
-	% param 3:  event name
-	% param 4:	institution (where did you work / study)
-	% param 5:	what was your position
-	% param 6:	color
-	% param 7: level (position, use minus for left placement)
-	\newcommand{\cvevent}[7] {
-		
-		\foreach \monthf/\yearf in {##1} {
-			\foreach \montht/\yeart in {##2} {
-
-				\pgfmathparse{#3/\fullrange*((\yearf-#1)+(\monthf/12))}
-  				\let\startexp\pgfmathresult
-				\pgfmathparse{#3/\fullrange*((\yeart-#1)+(\montht/12))}
-  				\let\endexp\pgfmathresult
-				\pgfmathparse{1/(\endexp-\startexp+1)}
-  				\let\lenexp\pgfmathresult
-				\pgfmathparse{0.5*\endexp+0.5*\startexp}
-  				\let\midexp\pgfmathresult
-
-				%\filldraw[fill=##6,draw=none, opacity=0.9] (-0.15-##7,\startexp) rectangle (-0.15-##7-0.5,\endexp);
-				\draw[draw=##6, line width=1.5pt] (0, \startexp) -- (1,\startexp);
-
-				\node[label={[label distance=0]0:\colorbox{##6}{\strut}\colorbox{white}{\textcolor{gray}{##1}\hspace{3pt}\textcolor{textcol}{##3}}}] at (0.5, \startexp) {};
-			}
-			\addtocounter{leftcount}{1}
-		}
-	}
-
-	%--------------------------------------------------------------------------------------
-	%	BEGIN
-	%--------------------------------------------------------------------------------------
-
-	\begin{tikzpicture}
-
-	\setcounter{leftcount}{1}
-
-	%calc fullrange= number of years
- 	\pgfmathparse{(#2-#1)}
-  	\let\fullrange\pgfmathresult
-	\draw[draw=textcol,line width=4pt] (0,0) -- (0,#3) ;	%the timeline
-
-	%for each year put a horizontal line in place
-	\setcounter{yearcount}{1}
-	\whiledo{\value{yearcount} < \fullrange}{
-		\draw[fill=white,draw=textcol, line width=2pt]  (0,#3/\fullrange*\value{yearcount}) circle (0.1);
-		\stepcounter{yearcount}
-	}
-
-	%start year
-	\filldraw[fill=white!100,draw=textcol,line width=3pt] (0,-0.5) circle (0.5);
-	\node[label=\textcolor{textcol}{\textbf{\small#1}}] at (0,-0.85) {}; 
-
-	%end year
-	\filldraw[fill=white!100,draw=textcol,line width=5pt] (0,#3+0.75) circle (0.75);
-	\node[label=\textcolor{textcol}{\textbf{\large#2}}] at (0,#3+0.42) {}; 
-
-
-	
-}%end begin part of newenv
-{\end{tikzpicture}}
-
-%--- FACT BUBBLE -------------------------------------------------------------
-% draw a circle with facts
-% param 1: fact text
-% param 2: scale default=1 (scales only chart, not label text)
-% param 3: big border color
-% param 4: second border color
-% param 5: label bg color
-\newcommand{\factbubble}[5]{
-	\begin{tikzpicture}
-	\pgfmathparse{#2*2}
-	\let\pbxwidth\pgfmathresult
-		\filldraw[fill=#3,draw=none] (0,0) circle (#2 * 1.5);
-		\filldraw[fill=#5,draw=#4, line width=3.5pt] (0,0) circle (#2 * 1.2);
-		\node at (0,0) {
-			\parbox{\pbxwidth cm}{
-				\begin{center}	
-					#1
-				\end{center}
-			}
-		};
-	\end{tikzpicture}
+\newtcolorbox{emergencybox}[1][]{
+  colback=danger!15,
+  colframe=danger,
+  fonttitle=\bfseries,
+  left=3mm,
+  right=3mm,
+  top=2mm,
+  bottom=2mm,
+  boxrule=2pt,
+  #1
 }
 
+% Compact lists
+\setlist[itemize]{leftmargin=*,itemsep=1pt,parsep=1pt,topsep=3pt}
+\setlist[enumerate]{leftmargin=*,itemsep=1pt,parsep=1pt,topsep=3pt}
 
-%============================================================================%
-%  CUSTOM SECTION COMMANDS
-%============================================================================%
+% Remove page numbers
+\pagestyle{empty}
 
-\newcommand{\cvsection}[2]{%
-	\textcolor{sectcol}{\uppercase{\textbf{#1}}}%
-}
+% Line spacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
 
-\newcommand{\cvsect}[4]{%
-	\textcolor{#3}{\hrule}%
-	\colorbox{#3}{{\cvsection{#1}{#4}}}%
-}
-
-\newcommand{\metasection}[2]{%
-	\begin{tabular*}{1\textwidth}{ l l }
-		#1&#2\\[12pt]
-	\end{tabular*}%
-}
-
-\newcommand{\cveventmeta}[2]{%
-	\mbox{\mystrut \hspace{87pt}\textit{#1}}\\
-	#2%
-}
-
-\newcommand{\mystrut}{\rule[-.3\baselineskip]{0pt}{\baselineskip}}
-\newcommand{\legend}[3]{\parbox{#2}{\textcolor{#3}{\rule{#2}{4pt}}\\#1}}
-\newcommand{\lorem}{Lorem ipsum dolor sit amet.}
-
-%============================================================================%
-%  DOCUMENT
-%============================================================================%
 \begin{document}
 
-\pagestyle{fancy}
-
-%--- TITLE HEADLINE ----------------------------------------------------------
-\mystrut
-\vspace{-12pt}
-
-\begin{tabular*}{1\textwidth}{c c c}
-	\parbox[c]{0.4\linewidth}{
-		\colorbox{thirdcol}{\huge{}{\textcolor{white}{\textbf{\uppercase{Claudio Chagas}}} }}\\
-		\Large{\textcolor{thirdcol}{\textsc{Senior Localization Specialist | EN$\rightarrow$PT-BR}}}\\
-	}&
-	\parbox{0.25\textwidth}{
-	\icontext{MapMarker}{10pt}{Rio de Janeiro, Brazil}\\
-	\icontext{Mobile}{10pt}{+55 21 999 5602 54}\\
-	\icontext{Envelope}{10pt}{aviatorone@gmail.com}\\
-	}&
-	\parbox{0.3\textwidth}{
-	\icontext{MousePointer}{10pt}{www.logostranslate.wordpress.com}\\
-	\icontext{Github}{10pt}{github.com/claudchagas}\\
-	\icontext{Linkedin}{10pt}{linkedin.com/in/claudiochagas}\\
-	}
-\end{tabular*}
-
-\small
-\vspace{16pt}
-
-\begin{minipage}{0.59\textwidth}
-
-%--- FACTS -------------------------------------------------------------------
-	\mbox{
-		\parbox[c][3cm][c]{0.29\textwidth}{
-		\textcolor{textcol}{My journey in translation began with volunteering for global non-profits, grounded in a Bachelor's degree in Publishing from Oxford. I now serve enterprise clients including OpenAI, Mailchimp, Keeper Security, Lucid Software, SAP, and Equinix through Smartling and Mojito.}
-		}
-		\hspace{10pt}
-		\parbox[c][3cm][c]{0.32\textwidth}{
-			\begin{center}
-			\factbubble{\huge{\textcolor{sectcol}{\textbf{B.A.}}}\\\small{\textcolor{sectcol}{\textbf{Publishing}}}}{1}{maincol}{sectcol}{thirdcol}\\
-			\textcolor{textcol}{latest degree from}\\
-			\textcolor{textcol}{\textbf{Oxford Brookes University}}
-			\end{center}
-		}
-		\hspace{10pt}
-		\parbox[c][3cm][c]{0.29\textwidth}{
-		\textcolor{textcol}{I specialise in technical UI localisation, AI platform content, SaaS documentation, and marketing transcreation for global technology enterprises targeting Brazilian audiences.}
-		}
-	}
-	\vspace{34pt}
-
-%--- SKILLS AND TECHNOLOGIES -------------------------------------------------
-	\cvsect{Skills and Technologies}{0.49}{thirdcol}{textcol}\\[4pt]
-	\mbox{
-		\parbox[b][150pt][c]{0.35\textwidth}{
-			\textcolor{textcol}{I combine deep linguistic expertise with proprietary workflow infrastructure, including Python tooling for glossary automation and Mojito skill files for enterprise accounts.}\\
-
-			\cvsect{Languages}{0.49}{thirdcol}{textcol}\\[4pt]
-			\icontext{Language}{14pt}{\colorbox{maincol}{Portuguese (native)}}\\
-			\icontext{Language}{14pt}{\colorbox{maincol}{English (C2)}}\\
-		}
-
-		\begin{piechart}{360}{2}{bgcol}{textcol}{sectcol}
-			\slice{16}{Copyediting}{thirdcol}
-			\slice{6}{Subtitling}{fourthcol}
-			\slice{10}{Personal Admin}{fifthcol}
-			\slice{16}{Proofreading}{secondcol}
-			\slice{54}{Translation}{maincol}
-		\end{piechart}\\
-	}
-	\begin{center}
-	\begin{tikzpicture}
-		\draw[draw=sectcol,dashed, opacity=0.5] (4,0) -- (-4,0);
-	\end{tikzpicture}
-	\end{center}
-
-	\mbox{\hspace{-14pt}
-		\begin{barchart}{10}{5.5}{sectcol}{textcol}{sectcol}{maincol}{secondcol}{thirdcol}
-			\baritem{90}{Smartling / Mojito}{100}{0}{0}
-			\baritem{80}{SDL Trados Studio}{0}{0}{70}
-			\baritem{75}{Python / GitHub}{0}{65}{0}
-			\baritem{65}{Google Suite}{0}{0}{60}
-			\baritem{60}{LaTeX}{0}{0}{50}
-		\end{barchart}
-		\hspace{10pt}
-		\parbox[b][100pt][c]{0.3\textwidth}{\textcolor{textcol}{I work across Smartling and Mojito for enterprise clients including OpenAI, Keeper Security, Lucid Software, and SAP, delivering UI strings, technical documentation, and marketing content.}}
-	}
-	\begin{center}
-	\begin{tikzpicture}
-		\draw[draw=sectcol,dashed, opacity=0.5] (4,0) -- (-4,0);
-	\end{tikzpicture}
-	\end{center}
-	\begin{center}
-	\mbox{
-		\parbox[b][2cm][c]{3cm}{
-			\textcolor{textcol}{I work with a specialised toolset built around enterprise localisation platforms and custom automation.}
-		}\hspace{12pt}
-		\bubbles{6/Smartling, 5/Mojito, 4/Trados, 4/Python, 3/LaTeX}{\cvsection{Technologies}}
-	}
-	\end{center}
-
-%--- ACTIVITIES --------------------------------------------------------------
-	\cvsect{Activities}{0.49}{thirdcol}{textcol}\\[20pt]
-	\mbox{
-		\parbox[b][3cm][c]{3cm}{
-			\factbubble{\HUGE{\textcolor{sectcol}{\textbf{15+}}}\\\large{\textcolor{sectcol}{\textbf{years}}}}{0.85}{maincol}{sectcol}{thirdcol}\\
-			\textcolor{textcol}{of experience in the}\\
-			\textcolor{textcol}{\textbf{\mbox{Translation Industry}}}
-		}
-
-		\parbox[b][3cm][c]{4cm}{
-			\textcolor{textcol}{I enjoy cycling to help maintain a healthy work-life balance and escape the city's hustle and bustle.}
-		}
-
-		\squares{20/Meditation,40/Biking,10/News,20/Music}{1}
-	}
-\end{minipage}
-\begin{minipage}{0.05\textwidth}
-	\begin{center}
-		\begin{tikzpicture}
-			\draw[draw=sectcol,dashed, opacity=0.5] (0,-12) -- (0,12);
-		\end{tikzpicture}
-	\end{center}
-\end{minipage}
-\begin{minipage}{0.4\textwidth}
-
-%--- EXPERIENCE AND EDUCATION ------------------------------------------------
-\cvsect{Experience and Education}{0.4}{thirdcol}{textcol}\\[16pt]
-
-\hspace{60pt}\mbox{\legend{Experience}{1.8cm}{maincol} \legend{Events}{1.1cm}{secondcol} \legend{Education}{1.5cm}{thirdcol}}
-\vspace{-40pt}
+% ============================================================
+% COVER PAGE
+% ============================================================
 \begin{center}
+\vspace*{2in}
 
-\begin{cvtimeline}{2000}{2026}{21}{\linewidth}
-\cvevent{8/2000}{7/2003}{Bachelor Studies, UK}{Oxford Brookes}{Master Thesis: Why Mass-Market Paperback Publishing is Still to Catch on in Brazil}{thirdcol}{0}
-\cvevent{1/2001}{12/2002}{Translator/Copy-editor}{Viva Network}{Worked on the Portuguese edition of a facilitator's handbook and four other language versions of a children worker's pack}{maincol}{1}
-\cvevent{6/2001}{7/2001}{Student Placement}{Oxford Brookes}{Worked as the administrator of the British Book Design and Production Awards \& BPIF for two consecutive years, in 2001 and 2002}{maincol}{1}
-\cvevent{6/2002}{7/2002}{Student Placement}{Oxford Brookes}{Worked as the administrator of the British Book Design and Production Awards \& BPIF for two consecutive years, in 2001 and 2002}{maincol}{1}
-\cvevent{3/2003}{3/2003}{The London Book Fair}{LBF}{The London Book Fair is the global marketplace for rights negotiation and the sale and distribution of content across print, audio, TV, film and digital channels}{secondcol}{0}
-\cvevent{10/2003}{10/2003}{Ashmolean Museum Oxford}{University of Oxford}{Worked as Part-time Sales and Display Assistant at the Ashmolean Museum Oxford book and gift shop}{maincol}{1}
-\cvevent{6/2004}{6/2004}{Rio Moto-GP 2004}{University of Oxford}{PA to the National Press Officer}{secondcol}{0}
-\cvevent{4/2005}{5/2005}{Lexus Brochures Translation}{Just Customer Communication}{Proofreading and editing translated copy and managing electronic copy-editing}{maincol}{1}
-\cvevent{9/2007}{11/2008}{Real Estate News Translation}{Dream Homes World Wide}{Work for an international real estate developer providing English translations from Portuguese and Spanish documents}{maincol}{1}
-\cvevent{8/2008}{9/2008}{User Interface Translation}{G.host Inc.}{Translation of the G.ho.st Virtual Computer user interface strings (Client Module -- 14,500+ words) into Brazilian Portuguese}{maincol}{1}
-\cvevent{10/2009}{10/2009}{Blog Articles Translation}{Sivers.org}{Translation of blog articles into Brazilian Portuguese for Derek Sivers, founder of CD Baby}{maincol}{1}
-\cvevent{3/2010}{3/2010}{Business Article Translation}{London Business School}{Translation of an article from the Brazilian business magazine Epoca into English, on the legacy of Jorge Paulo Lemann, the founder of Bank Garantia}{maincol}{1}
-\cvevent{7/2010}{9/2010}{Admin Interface Translation}{SafeKidZone}{String translation for backend database of SafeKidZone and SafeTREC website}{maincol}{1}
-\cvevent{3/2011}{4/2011}{Project Research Assistant}{University of Bremen}{Conduct Internet-based research on the presence of automakers on the social media landscape in Brazil, and translate relevant content into English}{maincol}{1}
-\cvevent{9/2011}{9/2011}{Website Translation}{Fortune3, Inc.}{Translate 700 strings (approx. 5000 words) of an ecommerce website into Portuguese}{maincol}{1}
-\cvevent{1/2009}{12/2012}{Communications Assistant}{Alpha International}{Assist the Relationship Manager and other managers of the national and international teams on a range of projects, from Jan 2009 to Dec 2012}{maincol}{1}
-\cvevent{11/2012}{11/2012}{Alpha Conference Aparecida}{Alpha International}{Help set up the venue, providing an essential service for the conference and seminar sessions}{secondcol}{0}
-\cvevent{7/2013}{7/2013}{World Youth Day 2013}{Alpha International}{Help find local suppliers, providing essential services for the event}{secondcol}{0}
-\cvevent{1/2014}{1/2014}{Executive Assistant}{Heathfield}{Assist the Director with a range of roles to support business operations}{maincol}{1}
-\cvevent{8/2016}{8/2016}{Rio 2016 Summer Olympics}{Organising Committee for the Rio 2016}{Help run the Venue Media Centre, providing an essential service and helping the press}{secondcol}{0}
-\cvevent{6/2017}{10/2017}{Subtitles Translation}{ZOO Digital Group plc}{Provide subtitle translation services for films or any other localization-related tasks}{maincol}{1}
-\cvevent{5/2019}{6/2024}{Senior Translator \& Localization Specialist}{Smartling / Mojito}{Delivering EN$\rightarrow$PT-BR localisation for enterprise clients including OpenAI, Mailchimp, Keeper Security, Lucid Software, SAP, and Equinix --- spanning AI platform UI, SaaS documentation, and marketing content}{maincol}{1}
-\end{cvtimeline}
+{\Huge\bfseries\color{primary} \faPlane\ \faBicycle\ \faSubway}
+
+\vspace{0.5in}
+
+{\Huge\bfseries\color{primary} LA BIKE \& METRO\\[0.2in] TRAVEL GUIDE}
+
+\vspace{0.3in}
+
+{\Large Pocket Guide • Alhambra Base}
+
+\vspace{1in}
+
+{\LARGE\bfseries November 10--26, 2025}
+
+\vspace*{\fill}
 \end{center}
-\end{minipage}
+
+\newpage
+
+% ============================================================
+% PAGE 2: TRIP SUMMARY
+% ============================================================
+
+\section*{\faClipboard\ Trip Summary}
+
+\begin{warningbox}[title=\faBullseye\ FIRST 48 HOURS PRIORITIES:]
+\begin{itemize}[leftmargin=0.3in,itemsep=2pt]
+\item[\checkmark] Purchase folding bike at REI Arcadia
+\item[\checkmark] Visit Apple Store Pasadena
+\item[\checkmark] Get Metro TAP card at Atlantic Station
+\end{itemize}
+\end{warningbox}
+
+\subsection*{\faPlane\ Flight Details}
+
+\begin{infobox}
+\textbf{Route:} GIG (Rio de Janeiro) $\rightarrow$ LAX (Los Angeles)\\
+\textbf{Airline:} American Airlines -- Main Cabin Economy\\
+\textbf{Duration:} $\sim$14h 22min (via MIA/DFW/CLT)\\
+\textbf{Booking:} aa.com | Request aisle/window seats\\
+\textbf{Seat Selection:} Avoid middle seats and seats near lavatories
+\end{infobox}
+
+\subsection*{\faHome\ Base Location}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{Alhambra, California}
+\begin{itemize}[leftmargin=0.2in]
+\item 8 miles east of Downtown LA
+\item Nearest Metro: Atlantic Station (L Line)
+\item Famous for Asian cuisine \& culture
+\end{itemize}
+\end{infobox}
+
+\subsection*{\faPhone\ Emergency Contacts}
+
+\begin{emergencybox}[title=\faExclamationTriangle\ EMERGENCY: 911]
+\end{emergencybox}
+
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=1pt]
+\item \textbf{Alhambra Police:} (626) 570-5151
+\item \textbf{Metro Customer Service:} (323) 466-3876
+\item \textbf{REI Arcadia:} (626) 447-1062
+\item \textbf{Apple Store Pasadena:} (626) 817-6820
+\end{itemize}
+\end{small}
+
+\subsection*{\faInfoCircle\ Essential Info}
+
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=1pt]
+\item \textbf{Currency:} US Dollar (\$)
+\item \textbf{Weather:} 60--75°F (15--24°C), sunny
+\item \textbf{Time Zone:} PST (UTC-8)
+\item \textbf{Languages:} English, Spanish, Chinese
+\item \textbf{Sales Tax:} 9.5\% on purchases
+\item \textbf{Tipping:} 15--20\% restaurants, \$1--2 services
+\end{itemize}
+\end{small}
+
+\subsection*{\faBackspace\ Essential Packing Checklist}
+
+\begin{small}
+\begin{multicols}{2}
+\textbf{Daily Carry:}
+\begin{itemize}[leftmargin=0.2in]
+\item Water bottle
+\item Sunscreen SPF 50+
+\item Sunglasses
+\item U-lock + cable
+\item Metro TAP card
+\end{itemize}
+
+\columnbreak
+
+\textbf{Tech \& Safety:}
+\begin{itemize}[leftmargin=0.2in]
+\item Phone mount
+\item Power bank
+\item First aid kit
+\item Light jacket
+\item Bike lights
+\end{itemize}
+\end{multicols}
+\end{small}
+
+\newpage
+
+% ============================================================
+% PAGE 3: METRO SYSTEM
+% ============================================================
+
+\section*{\faSubway\ LA Metro System Overview}
+
+\begin{center}
+\fbox{\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{0.3in}
+\textbf{\large LA Metro Map}\\[0.2in]
+
+\textbf{Key Lines from Alhambra:}\\[0.15in]
+
+\colorbox{yellow!80}{\textbf{\textcolor{black}{L LINE (GOLD)}}} Atlantic Station\\
+$\rightarrow$ Pasadena, Union Station, Chinatown\\[0.1in]
+
+\colorbox{red}{\textbf{\textcolor{white}{B LINE (RED)}}} Transfer at Union\\
+$\rightarrow$ Hollywood, Universal City\\[0.1in]
+
+\colorbox{blue}{\textbf{\textcolor{white}{A LINE (BLUE)}}} Transfer at Union\\
+$\rightarrow$ Long Beach, Downtown\\[0.1in]
+
+\vspace{0.3in}
+\end{minipage}}
+\end{center}
+
+\subsection*{\faTrain\ Metro TAP Card Guide}
+
+\begin{small}
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\rowcolor{primary!80}\textcolor{white}{\textbf{Pass Type}} & \textcolor{white}{\textbf{Cost}} & \textcolor{white}{\textbf{Best For}} \\
+\hline
+TAP Card & \$2 & One-time fee \\
+\hline
+Single Ride & \$1.75 & One trip \\
+\hline
+Day Pass & \$7 & Unlimited daily \\
+\hline
+7-Day Pass & \$25 & \colorbox{yellow}{\textbf{BEST VALUE}} \\
+\hline
+\end{tabularx}
+\end{small}
+
+\begin{tipbox}[title=\faLightbulb\ Metro + Bike Tips:]
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=1pt]
+\item Bikes allowed on ALL trains \& most buses
+\item Avoid rush hours (7--9am, 4--7pm) when possible
+\item Bike lockers: \$0.05/day with TAP card
+\item Folding bikes can stay with you (don't need rack)
+\item Download: Metro LA app for real-time updates
+\end{itemize}
+\end{small}
+\end{tipbox}
+
+\subsection*{\faClock\ Key Destinations \& Travel Times}
+
+\begin{small}
+\begin{tabularx}{\textwidth}{|X|c|c|}
+\hline
+\rowcolor{primary!80}\textcolor{white}{\textbf{Destination}} & \textcolor{white}{\textbf{Line}} & \textcolor{white}{\textbf{Time}} \\
+\hline
+Pasadena (Old Town) & \colorbox{yellow!80}{L} & 12 min \\
+\hline
+Union Station (Downtown) & \colorbox{yellow!80}{L} & 20 min \\
+\hline
+Chinatown & \colorbox{yellow!80}{L} & 15 min \\
+\hline
+Hollywood/Highland & \colorbox{yellow!80}{L}$\rightarrow$\colorbox{red}{\textcolor{white}{B}} & 45 min \\
+\hline
+Universal City & \colorbox{yellow!80}{L}$\rightarrow$\colorbox{red}{\textcolor{white}{B}} & 55 min \\
+\hline
+\end{tabularx}
+\end{small}
+
+\subsection*{\faMobile\ Essential Apps}
+
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=1pt]
+\item \textbf{Metro LA:} Official transit app, real-time arrivals
+\item \textbf{Google Maps:} Navigation, bike routes
+\item \textbf{Citymapper:} Trip planning, multi-modal
+\item \textbf{Yelp:} Restaurant reviews, local recommendations
+\item \textbf{Strava:} Track bike rides, discover routes
+\item \textbf{Komoot:} Outdoor route planning and navigation for hiking, cycling, and running
+\item \textbf{Go Jauntly:} A free community-based walking app
+\item \textbf{REI:} REI Co-op Shopping App
+\end{itemize}
+\end{small}
+
+\newpage
+
+% ============================================================
+% PAGE 4: BIKE ROUTES
+% ============================================================
+
+\section*{\faBicycle\ Bike Tour Routes from Alhambra}
+
+\begin{center}
+\fbox{\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{0.3in}
+\textbf{\large Alhambra Bike Routes Map}\\[0.15in]
+
+\textbf{Key Locations:}\\[0.1in]
+\faStore\ REI Arcadia (4 mi NE)\\
+\faApple\ Apple Store Pasadena (3 mi N)\\
+\faBook\ Huntington Library (3.5 mi NW)\\
+\faTree\ LA County Arboretum (4 mi NE)\\
+\faLandmark\ Old Pasadena (3 mi N)\\[0.1in]
+
+\vspace{0.3in}
+\end{minipage}}
+\end{center}
+
+\subsubsection*{Route 1: Alhambra--Pasadena Loop}
+
+\begin{routebox}
+\textbf{Distance:} 10 miles | \textbf{Time:} 1.5--2 hrs | \textbf{Difficulty:} Easy-Moderate\\[3pt]
+Alhambra $\rightarrow$ South Pasadena $\rightarrow$ Old Pasadena (Colorado Blvd) $\rightarrow$ Huntington Library area $\rightarrow$ San Marino $\rightarrow$ Return\\[3pt]
+\textbf{Highlights:} Historic architecture, shopping, gardens
+\end{routebox}
+
+\subsubsection*{Route 2: San Gabriel Valley Cultural Tour}
+
+\begin{routebox}
+\textbf{Distance:} 12 miles | \textbf{Time:} 2--3 hrs | \textbf{Difficulty:} Easy\\[3pt]
+Alhambra $\rightarrow$ San Gabriel Mission $\rightarrow$ Temple City $\rightarrow$ Arcadia (REI) $\rightarrow$ Santa Anita Park $\rightarrow$ Return\\[3pt]
+\textbf{Highlights:} Historic mission, parks, shopping
+\end{routebox}
+
+\subsubsection*{Route 3: LA River Trail}
+
+\begin{routebox}
+\textbf{Distance:} 15 miles one-way | \textbf{Time:} Half day | \textbf{Difficulty:} Moderate\\[3pt]
+Alhambra $\rightarrow$ LA River bike path $\rightarrow$ Griffith Park $\rightarrow$ (optional: Burbank)\\[3pt]
+\textbf{Highlights:} Dedicated bike path, nature, Griffith Observatory
+\end{routebox}
+
+\subsubsection*{Route 4: Rose Bowl \& Arroyo Seco}
+
+\begin{routebox}
+\textbf{Distance:} 8 miles | \textbf{Time:} 2 hrs | \textbf{Difficulty:} Moderate (hills)\\[3pt]
+Metro to Memorial Park $\rightarrow$ Rose Bowl $\rightarrow$ Arroyo Seco trails $\rightarrow$ Lower Arroyo Park\\[3pt]
+\textbf{Highlights:} Stadium, natural trails, scenic views
+\end{routebox}
+
+\subsection*{\faWrench\ Bike Safety \& Maintenance}
+
+\begin{tipbox}[title=Safety First:]
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=1pt]
+\item Always wear helmet (available at REI)
+\item Use front white light + rear red light (required at night)
+\item Stay in bike lanes when available
+\item Watch for car doors opening (ride 3ft from parked cars)
+\item Follow traffic signals -- bikes = vehicles
+\end{itemize}
+
+\textbf{Security:}
+\begin{itemize}[leftmargin=0.2in,itemsep=1pt]
+\item ALWAYS lock bike, even for 1 minute
+\item Use U-lock through frame + rear wheel
+\item Cable lock for front wheel
+\item Lock to fixed objects in visible areas
+\item Take lights and computer with you
+\end{itemize}
+\end{small}
+\end{tipbox}
+
+\newpage
+
+% ============================================================
+% PAGE 5: TOP ATTRACTIONS
+% ============================================================
+
+\section*{\faStar\ Top Attractions}
+
+\subsection*{\faBicycle\ Bike-Friendly (Within 5 miles)}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{The Huntington Library \& Gardens}\\
+\faMapMarker\ 1151 Oxford Rd, San Marino (3.5 mi)\\
+\faDollarSign\ \$25--30 | \faClock\ Wed--Mon 10am--5pm\\
+World-class art, rare books, 120-acre gardens. Reserve online!
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{LA County Arboretum}\\
+\faMapMarker\ 301 N Baldwin Ave, Arcadia (4 mi)\\
+\faDollarSign\ \$15 | \faClock\ Daily 9am--4:30pm\\
+127-acre botanical garden, peacocks, historic buildings
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{Old Pasadena}\\
+\faMapMarker\ Colorado Blvd area (3 mi)\\
+\faDollarSign\ Free | \faClock\ Varies by shop\\
+Historic district, restaurants, shopping, nightlife
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{Norton Simon Museum}\\
+\faMapMarker\ 411 W Colorado Blvd, Pasadena (4 mi)\\
+\faDollarSign\ \$15 | \faClock\ Wed--Mon 12--5pm\\
+European masters, Asian art, sculpture garden
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{Gamble House}\\
+\faMapMarker\ 4 Westmoreland Pl, Pasadena (4 mi)\\
+\faDollarSign\ \$15 tours | \faClock\ Thu--Sun\\
+Iconic Craftsman architecture (Back to the Future house!)
+\end{infobox}
+
+\subsection*{\faSubway\ Metro Accessible}
+
+\begin{small}
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{Downtown LA Arts District}\\
+\colorbox{yellow!80}{L Line} 20 min\\
+Street art, galleries, Grand Central Market, food scene
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{Chinatown}\\
+\colorbox{yellow!80}{L Line} 15 min\\
+Authentic dim sum, shops, cultural sites, festivals
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{Little Tokyo}\\
+\colorbox{yellow!80}{L Line} + walk 25 min\\
+Japanese culture, ramen, MOCA, Japanese American Museum
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{Hollywood Walk of Fame}\\
+\colorbox{yellow!80}{L}$\rightarrow$\colorbox{red}{\textcolor{white}{B}} 45 min\\
+Chinese Theatre, Walk of Fame, Hollywood Sign views
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{Universal Studios Hollywood}\\
+\colorbox{yellow!80}{L}$\rightarrow$\colorbox{red}{\textcolor{white}{B}} 55 min\\
+\faDollarSign\ \$100+ online | Full day adventure
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{Griffith Observatory}\\
+\colorbox{red}{\textcolor{white}{B Line}} to Vermont + bike/bus\\
+\faDollarSign\ Free (planetarium \$7) | Best sunset views of LA
+\end{infobox}
+\end{small}
+
+\subsection*{\faUtensils\ Alhambra Food Scene}
+
+\begin{tipbox}[title=Must-Try:]
+\textbf{Alhambra is THE destination for authentic Chinese cuisine!}
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=1pt]
+\item \textbf{Lunasia Dim Sum House:} Dim sum, traditional Chinese dishes
+\item \textbf{Valley Blvd:} 2+ miles of Asian restaurants
+\item \textbf{Din Tai Fung:} World-famous soup dumplings
+\item \textbf{Sam Woo BBQ:} Cantonese roast meats
+\item \textbf{Mama Lu's:} Dumpling house
+\item \textbf{Bubble Tea:} Dozens of shops throughout
+\end{itemize}
+\end{small}
+\end{tipbox}
+
+%\newpage
+
+% ============================================================
+% PAGE 6: SHOPPING
+% ============================================================
+
+\section*{\faShoppingCart\ Shopping Stops}
+
+\subsection*{\faStore\ REI Arcadia (PRIORITY)}
+
+\begin{infobox}
+\faMapMarker\ \textbf{Address:} 214 N Santa Anita Ave, Arcadia, CA 91006\\
+\faClock\ \textbf{Hours:} Mon--Sat 10am--9pm, Sun 10am--7pm\\
+\faBicycle\ \textbf{From Alhambra:} 4 miles (15 min bike/Uber)\\
+\faPhone\ \textbf{Phone:} (626) 447-1062
+\end{infobox}
+
+\begin{tipbox}[title=Recommended Folding Bikes (\$300--800):]
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=1pt]
+\item \textbf{Tern Link C8:} $\sim$\$500, reliable, good for touring
+\item \textbf{Dahon Mariner D8:} $\sim$\$600, lightweight aluminum
+\item \textbf{\href{https://www.rei.com/product/224074/brompton-c-line-explore-folding-bike-mid}{Brompton C Line Explore}:} $\sim$\$1900+ (premium, ultra-compact)
+\end{itemize}
+
+\faShoppingBag\ \textbf{Also Purchase:} Helmet, U-lock + cable (\href{https://www.rei.com/product/188310/kryptonite-evolution-mini-u-lock-with-flex-cable}{Evolution Mini U-Lock with Flex Cable}), lights, water bottle holder, small handlebar bag, bike pump.
+\end{small}
+\end{tipbox}
+
+\subsection*{\faApple\ Apple Store Pasadena}
+
+\begin{infobox}
+\faMapMarker\ \textbf{Address:} 54 W Colorado Blvd, Pasadena, CA 91105\\
+\faClock\ \textbf{Hours:} Daily 10am--9pm\\
+\faBicycle\ \textbf{From Alhambra:} 3 miles bike OR \colorbox{yellow!80}{L Line} to Memorial Park\\
+\faPhone\ \textbf{Phone:} (626) 817-6820
+\end{infobox}
+
+\subsection*{\faLightbulb\ Handy Tips}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{\faBicycle\ Bike Transport on Metro}
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=0pt]
+\item Bikes allowed on all trains (4 bike spaces per car)
+\item Board through wide doors at ends of train
+\item Folding bikes can stay with you (don't need rack)
+\item Some buses have front bike racks (2 bikes max)
+\item Avoid rush hours when possible
+\end{itemize}
+\end{small}
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{\faCreditCard\ TAP Card Purchase Locations}
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=0pt]
+\item Atlantic Station (nearest to Alhambra)
+\item Any Metro station vending machine
+\item Many CVS, 7-Eleven, Ralphs stores
+\item tap.metro.net (order online, delivered)
+\end{itemize}
+\end{small}
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{\faSun\ Weather \& What to Wear}
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=0pt]
+\item November: Perfect weather 60--75°F
+\item Sunny most days, light jacket for evenings
+\item ALWAYS sunscreen (UV is strong!)
+\item Comfortable walking/biking shoes
+\item Layers work best
+\end{itemize}
+\end{small}
+\end{infobox}
+
+\begin{infobox}[colback=gray!10,colframe=gray]
+\textbf{\faMobile\ Phone \& Internet}
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=0pt]
+\item Holafly: Travel eSIM with unlimited data - \texttt{eSIM}\$52.90 for 16 days
+\item Consider prepaid SIM: T-Mobile or AT\&T
+\item Available at airports, Best Buy, carrier stores
+\item Tourist SIM plans: $\sim$\$30--50 for 2--3 weeks
+\item Free WiFi: Coffee shops, libraries, Apple Store
+\end{itemize}
+\end{small}
+\end{infobox}
+
+\subsection*{\faCalendar\ Special Dates During Your Visit}
+
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=1pt]
+\item \textbf{Nov 11:} Veterans Day (federal holiday, some closures)
+\item \textbf{Nov 28:} Thanksgiving (major holiday, most places closed)
+\item \textbf{Nov 29:} Black Friday (major shopping day, crowds)
+\end{itemize}
+\end{small}
+
+\newpage
+
+% ============================================================
+% PAGE 7: DAILY PLANNER
+% ============================================================
+
+\section*{\faCalendar\ Daily Planner \& Schedule}
+
+\begin{small}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 1 - Mon, Nov 10: ARRIVAL}]
+Land LAX $\rightarrow$ Transport to Alhambra $\rightarrow$ Rest\\
+Evening: Explore neighborhood, dinner Valley Blvd
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 2 - Tue, Nov 11: GET EQUIPPED}]
+Morning: REI Arcadia (buy bike + gear)\\
+Afternoon: Apple Store Pasadena + Old Town\\
+Get TAP card at Atlantic Station
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 3 - Wed, Nov 12: PASADENA DAY}]
+Bike to Old Pasadena $\rightarrow$ Norton Simon Museum\\
+Lunch Colorado Blvd $\rightarrow$ Gamble House or Rose Bowl
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 4 - Thu, Nov 13: GARDENS}]
+Morning: Huntington Library \& Gardens\\
+Afternoon: LA County Arboretum
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 5 - Fri, Nov 14: DOWNTOWN LA}]
+Metro to Downtown $\rightarrow$ Grand Central Market\\
+Arts District $\rightarrow$ Olvera Street $\rightarrow$ Walt Disney Concert Hall
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 6 - Sat, Nov 15: HOLLYWOOD}]
+Metro to Hollywood/Highland $\rightarrow$ Walk of Fame\\
+Chinese Theatre $\rightarrow$ Griffith Observatory (sunset)
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 7 - Sun, Nov 16: LONG BIKE RIDE}]
+LA River Trail to Griffith Park (15+ miles)\\
+Pack lunch, full day adventure
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 8 - Mon, Nov 17: SAN GABRIEL VALLEY}]
+San Gabriel Valley Cultural Tour by bike\\
+Mission $\rightarrow$ Temple City $\rightarrow$ Santa Anita
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 9 - Tue, Nov 18: ASIAN LA}]
+Metro to Chinatown (lunch) $\rightarrow$ Little Tokyo\\
+Explore Japanese American Museum
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 10 - Wed, Nov 19: LOCAL LOOP}]
+South Pasadena \& San Marino bike loop\\
+Relax, catch up on local spots
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 11 - Thu, Nov 20: UNIVERSAL STUDIOS}]
+Full day at Universal Studios Hollywood\\
+Metro there and back, buy tickets online
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 12 - Fri, Nov 21: BEACH DAY}]
+Santa Monica \& Venice Beach\\
+Metro + bike or bus, full day trip
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 13 - Sat, Nov 22: CULTURE}]
+Getty Center OR LACMA + La Brea Tar Pits\\
+Choose based on interests
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 14 - Sun, Nov 23: THANKSGIVING PREP}]
+Relaxed day, local exploration\\
+Check Thanksgiving dinner options
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 15 - Mon, Nov 24: THANKSGIVING}]
+Experience local Thanksgiving\\
+Many restaurants offer special menus
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 16 - Tue, Nov 25: FINAL EXPLORATIONS}]
+Last minute sights, shopping\\
+Pack, organize bike return/donation
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary!50,title=\textbf{Day 17 - Wed, Nov 26: DEPARTURE}]
+Check flight time $\rightarrow$ Transport to LAX\\
+Departure home
+\end{tcolorbox}
+
+\end{small}
+
+\begin{warningbox}[title=\faLightbulb\ Planning Tips:]
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=1pt]
+\item Book museum tickets online in advance
+\item Check weather daily, adjust plans
+\item Rest days are okay -- don't overdo it!
+\item Mix Metro days with bike days for variety
+\end{itemize}
+\end{small}
+\end{warningbox}
+
+\newpage
+
+% ============================================================
+% PAGE 8: NOTES & CONTACTS
+% ============================================================
+
+\section*{\faStickyNote\ Notes \& Quick Reference}
+
+\subsection*{\faAmbulance\ Emergency Numbers}
+
+\begin{emergencybox}[title=\faExclamationTriangle\ DIAL 911 FOR ALL EMERGENCIES]
+\end{emergencybox}
+
+\begin{small}
+\begin{tabularx}{\textwidth}{|X|l|}
+\hline
+\rowcolor{primary!80}\textcolor{white}{\textbf{Service}} & \textcolor{white}{\textbf{Number}} \\
+\hline
+Alhambra Police (non-emergency) & (626) 570-5151 \\
+\hline
+Metro Customer Service & (323) 466-3876 \\
+\hline
+Poison Control & (800) 222-1222 \\
+\hline
+REI Arcadia & (626) 447-1062 \\
+\hline
+Apple Store Pasadena & (626) 817-6820 \\
+\hline
+\end{tabularx}
+\end{small}
+
+\subsection*{\faMapMarked\ Key Addresses}
+
+\begin{small}
+\textbf{REI Arcadia:} 214 N Santa Anita Ave, Arcadia 91006\\
+\textbf{Apple Store:} 54 W Colorado Blvd, Pasadena 91105\\
+\textbf{Atlantic Station:} 100 W Atlantic Blvd, Alhambra\\
+\textbf{Huntington Library:} 1151 Oxford Rd, San Marino\\
+\textbf{LA County Arboretum:} 301 N Baldwin Ave, Arcadia
+\end{small}
+
+\subsection*{\faLink\ Useful Websites}
+
+\begin{small}
+\textbf{Metro LA:} metro.net\\
+\textbf{TAP Card:} tap.metro.net\\
+\textbf{LA Tourism:} discoverlosangeles.com\\
+\textbf{Bike Route Planner:} Google Maps (bike mode)\\
+\textbf{REI:} rei.com/stores/arcadia\\
+\textbf{Weather:} weather.com or weather.gov
+\end{small}
+
+\subsection*{\faCheckSquare\ Pre-Trip Checklist}
+
+\begin{small}
+\begin{multicols}{2}
+\textbf{Before You Leave:}
+\begin{itemize}[label=$\square$,leftmargin=0.2in,itemsep=1pt]
+\item Book AA flight
+\item Print this guide
+\item Download Metro app
+\item Check passport validity
+\item Notify credit card co.
+\item Travel insurance
+\end{itemize}
+
+\columnbreak
+
+\textbf{First Day in LA:}
+\begin{itemize}[label=$\square$,leftmargin=0.2in,itemsep=1pt]
+\item Get to Alhambra safely
+\item Buy folding bike at REI
+\item Get Metro TAP card
+\item Visit Apple Store
+\item Test bike locally
+\item Buy groceries/water
+\end{itemize}
+\end{multicols}
+\end{small}
+
+\subsection*{\faPencilRuler\ Personal Notes Space}
+
+\vspace{2in}
+\hrule
+
+
+\subsection*{\faStar\ Top 5 Must-Do Experiences}
+
+\begin{small}
+\begin{enumerate}[leftmargin=0.3in,itemsep=2pt]
+\item \textbf{Huntington Library Gardens} -- World-class botanical paradise
+\item \textbf{LA River Trail Bike Ride} -- Unique urban nature experience
+\item \textbf{Alhambra Food Tour} -- Authentic Chinese cuisine adventure
+\item \textbf{Griffith Observatory Sunset} -- Iconic LA views
+\item \textbf{Metro Exploration} -- Downtown, Chinatown, Hollywood
+\end{enumerate}
+\end{small}
+
+\begin{tipbox}[title=\faLuggageCart\ Packing Brompton for Airline Baggage:]
+\begin{small}
+\faYoutube\ \textbf{How-To Videos:} Checking the bike as regular airline baggage: \href{https://youtube.com/shorts/hHF_0A1559g}{Fly your bike around the world}. Cardboard box solution: \href{https://youtu.be/ihlxnkhQE5Q?t=147}{3 Ways to Fly with your Brompton Bike}.
+
+\faBloggerB\ \textbf{Coroplast Solution:} Measurements for cutting coroplast: \href{https://ahpekbiker.blogspot.com/2015/03/brompton-accessories-15-packing.html}{Packing the Brompton for Air Travel}.
+
+\faShoppingBag\ \textbf{Also Purchase:} Two IKEA Dimpa Bags: \href{https://www.amazon.com/IKEA-DIMPA-Storage-Moisture-Protection/dp/B07F98BQ6W/ref=sr_1_1}{Ikea DIMPA 3 pcs Extra Large Storage Bag}. Medium-Length 5mm Hex Key: \href{https://www.rei.com/product/705922/pedros-l-hex-wrench-set}{L Hex Wrench Set}.
+\end{small}
+\end{tipbox}
+
+\begin{tipbox}[title=\faStar\ Final Tips for Success:]
+\begin{small}
+\begin{itemize}[leftmargin=0.2in,itemsep=1pt]
+\item Stay flexible -- weather and energy levels vary
+\item Hydrate constantly -- dry climate, lots of biking
+\item Lock your bike EVERY time you leave it
+\item Take photos but also enjoy the moment
+\item Don't try to see everything -- quality over quantity
+\item Ask locals for recommendations -- people are friendly!
+\item Save energy for the experiences that matter to YOU
+\end{itemize}
+\end{small}
+\end{tipbox}
+
+\vspace{0.5in}
+
+\begin{center}
+\rule{0.8\textwidth}{2pt}
+
+\vspace{0.2in}
+
+{\Large\bfseries\color{primary} Have an Amazing Adventure! \faPlaneDeparture\ \faSun\ \faBicycle}
+
+\vspace{0.15in}
+
+{\large Los Angeles • November 10--26, 2025}
+
+\vspace{0.1in}
+
+{\small\color{gray} Created with \faHeart\ for your journey}
+\end{center}
 
 \end{document}
