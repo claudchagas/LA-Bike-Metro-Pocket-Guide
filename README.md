@@ -53,7 +53,7 @@ See `COMPILATION_GUIDE.md` for detailed instructions.
 
 ## ⚖️ License
 
-CC BY-NC-SA 4.0 — See [LICENSE](LICENSE.md) file for details.
+CC BY-NC-SA 4.0 — See [LICENSE](LICENSE) file for details.
 
 ---
 
