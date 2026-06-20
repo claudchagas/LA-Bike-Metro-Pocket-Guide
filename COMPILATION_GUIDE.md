@@ -70,7 +70,7 @@ Download `LA_Bike_Metro_Pocket_Guide.pdf` directly from [Releases](https://githu
 
 ## Printing
 
-> ⚠️ **Important — Paper Size:** This guide is formatted for **US Letter (8.5" × 11")**, not A4. Before printing, explicitly set your printer's paper size to **Letter**. If your printer defaults to A4 (common outside the US), the layout will be scaled or cropped incorrectly. In Overleaf, also go to **Menu → Settings → Paper size → Letter** before compiling.
+> ⚠️ **Important — Paper Size:** This guide is formatted for **US Letter (8.5" × 11")**, not A4. Paper size is controlled by the LaTeX source via `\usepackage[letterpaper, margin=0.5in]{geometry}` — Overleaf respects this automatically. When printing, explicitly set your printer's paper size to **Letter**. If your printer defaults to A4 (common outside the US), the layout will be scaled or cropped incorrectly.
 
 | Setting | Value |
 |---------|-------|
